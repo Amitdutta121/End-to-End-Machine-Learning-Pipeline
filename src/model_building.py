@@ -5,6 +5,7 @@ import pickle
 import logging
 from sklearn.ensemble import RandomForestClassifier
 import yaml
+from utils import get_project_root
 
 from logger_setup import setup_logger
 logger = setup_logger(__name__, log_file='model_building.log', level=logging.DEBUG)
@@ -102,14 +103,14 @@ def save_model(model, file_path: str) -> None:
 
 def main():
     try:
-        params = load_params('params.yaml')['model_building']
-        train_data = load_data('./data/processed/train_tfidf.csv')
+        params = load_params(os.path.join(get_project_root(), 'params.yaml'))['model_building']
+        train_data = load_data(os.path.join(get_project_root(), 'data', 'processed', 'train_tfidf.csv'))
         X_train = train_data.iloc[:, :-1].values
         y_train = train_data.iloc[:, -1].values
 
         clf = train_model(X_train, y_train, params)
 
-        model_save_path = 'models/model.pkl'
+        model_save_path = os.path.join(get_project_root(), 'models', 'model.pkl')
         save_model(clf, model_save_path)
 
     except Exception as e:

@@ -6,7 +6,8 @@ import logging
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score
 import yaml
-from dvclive import Live
+# from dvclive import Live
+from utils import get_project_root, from_root
 
 from logger_setup import setup_logger
 
@@ -36,11 +37,12 @@ def load_model(file_path: str):
         with open(file_path, 'rb') as file:
             model = pickle.load(file)
         logger.debug('Model loaded from %s', file_path)
+        return model  # ✅ This line was missing
     except FileNotFoundError:
         logger.error('Model file not found: %s', file_path)
         raise
     except Exception as e:
-        logger.error('Unexcepted error occurred while loading the model: %s', e)
+        logger.error('Unexpected error occurred while loading the model: %s', e)
         raise
 
 
@@ -82,6 +84,7 @@ def evaluate_model(clf, X_test: np.ndarray, y_test: np.ndarray) -> dict:
         raise
 
 
+
 def save_metrics(metrics: dict, file_path: str) -> None:
     """Save the evaluation metrics to a JSON file."""
     try:
@@ -97,9 +100,9 @@ def save_metrics(metrics: dict, file_path: str) -> None:
 
 def main():
     try:
-        params = load_params(params_path='params.yaml')
-        clf = load_model('./models/model.pkl')
-        test_data = load_data('./data/processed/test_tfidf.csv')
+        params = load_params(params_path=os.path.join(get_project_root(), 'params.yaml'))
+        clf = load_model(os.path.join(get_project_root(), 'models', 'model.pkl'))
+        test_data = load_data(os.path.join(get_project_root(), 'data', 'processed', 'test_tfidf.csv'))
 
         X_test = test_data.iloc[:, :-1].values
         y_test = test_data.iloc[:, -1].values
@@ -107,14 +110,14 @@ def main():
         metrics = evaluate_model(clf, X_test, y_test)
 
         # Experiment tracking using dvclive
-        with Live(save_dvc_exp=True) as live:
-            live.log_metric('accuracy', accuracy_score(y_test, y_test))
-            live.log_metric('precision', precision_score(y_test, y_test))
-            live.log_metric('recall', recall_score(y_test, y_test))
+        # with Live(save_dvc_exp=True) as live:
+        #     live.log_metric('accuracy', accuracy_score(y_test, y_test))
+        #     live.log_metric('precision', precision_score(y_test, y_test))
+        #     live.log_metric('recall', recall_score(y_test, y_test))
+        #
+        #     live.log_params(params)
 
-            live.log_params(params)
-
-        save_metrics(metrics, 'reports/metrics.json')
+        save_metrics(metrics, from_root('reports', 'metrics.json'))
     except Exception as e:
         logger.error('Failed to complete the model evaluation process: %s', e)
         print(f"Error: {e}")

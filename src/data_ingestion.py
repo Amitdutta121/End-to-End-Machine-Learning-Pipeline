@@ -3,31 +3,11 @@ import pandas as pdf
 import os
 from sklearn.model_selection import train_test_split
 import logging
+from logger_setup import setup_logger
+from utils import get_project_root
 
-log_dir = 'logs'
-current_file = os.path.abspath(__file__)
-project_root = os.path.dirname(os.path.dirname(current_file))
+logger = setup_logger(__name__, log_file='data_ingestion.log', level=logging.DEBUG)
 
-log_dir = os.path.join(project_root, log_dir)
-os.makedirs(log_dir, exist_ok=True)
-
-# logging configuration
-logger = logging.getLogger("data-ingestion")
-logger.setLevel(logging.DEBUG)
-
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-
-log_file_path = os.path.join(log_dir, 'data_ingestion.log')
-file_handler = logging.FileHandler(log_file_path)
-file_handler.setLevel(logging.DEBUG)
-
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-console_handler.setFormatter(formatter)
-file_handler.setFormatter(formatter)
-
-logger.addHandler(console_handler)
-logger.addHandler(file_handler)
 
 
 def load_data(data_url: str) -> pd.DataFrame:
@@ -75,7 +55,7 @@ def save_data(train_data: pd.DataFrame, test_data: pd.DataFrame, data_path: str)
 def main():
     try:
         test_size = 0.2
-        data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
+        data_path = os.path.join(get_project_root(), 'data')
         df = load_data(data_url='https://raw.githubusercontent.com/vikashishere/Datasets/main/spam.csv')
         final_df = preprocess_data(df)
         train_data, test_data = train_test_split(final_df, test_size=test_size, random_state=2)
