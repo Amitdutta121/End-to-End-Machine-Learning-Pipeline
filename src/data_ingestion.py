@@ -5,8 +5,9 @@ from sklearn.model_selection import train_test_split
 import logging
 from logger_setup import setup_logger
 from utils import get_project_root
+import constants
 
-logger = setup_logger(__name__, log_file='data_ingestion.log', level=logging.DEBUG)
+logger = setup_logger(__name__, log_file=constants.LogFiles.data_ingestion, level=logging.DEBUG)
 
 
 
@@ -42,7 +43,7 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
 def save_data(train_data: pd.DataFrame, test_data: pd.DataFrame, data_path: str) -> None:
     """Save the train and test datasets."""
     try:
-        raw_data_path = os.path.join(data_path, 'raw')
+        raw_data_path = os.path.join(data_path, constants.Folders.raw)
         os.makedirs(raw_data_path, exist_ok=True)
         train_data.to_csv(os.path.join(raw_data_path, "train.csv"), index=False)
         test_data.to_csv(os.path.join(raw_data_path, "test.csv"), index=False)
@@ -55,7 +56,7 @@ def save_data(train_data: pd.DataFrame, test_data: pd.DataFrame, data_path: str)
 def main():
     try:
         test_size = 0.2
-        data_path = os.path.join(get_project_root(), 'data')
+        data_path = os.path.join(get_project_root(), constants.Folders.data)
         df = load_data(data_url='https://raw.githubusercontent.com/vikashishere/Datasets/main/spam.csv')
         final_df = preprocess_data(df)
         train_data, test_data = train_test_split(final_df, test_size=test_size, random_state=2)

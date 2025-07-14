@@ -5,6 +5,7 @@ import logging
 import yaml
 from utils import get_project_root
 from logger_setup import setup_logger
+import constants
 
 logger = setup_logger(__name__, log_file='feature_engineering.log', level=logging.DEBUG)
 
@@ -81,17 +82,17 @@ def save_data(df: pd.DataFrame, file_path: str) -> None:
 
 def main():
     try:
-        params = load_params(params_path=os.path.join(get_project_root(), 'params.yaml'))
+        params = load_params(params_path=os.path.join(get_project_root(), constants.Folders.params))
         max_features = params['feature_engineering']['max_features']
         # max_features = 50
 
-        train_data = load_data(os.path.join(get_project_root(), "data", "interim", "train_processed.csv"))
-        test_data = load_data(os.path.join(get_project_root(), "data", "interim", "test_processed.csv"))
+        train_data = load_data(os.path.join(get_project_root(), constants.Folders.data, constants.Folders.interim, "train_processed.csv"))
+        test_data = load_data(os.path.join(get_project_root(), constants.Folders.data, constants.Folders.interim, "test_processed.csv"))
 
         train_df, test_df = apply_tfidf(train_data, test_data, max_features)
 
-        save_data(train_df, os.path.join(get_project_root(), "data", "processed", "train_tfidf.csv"))
-        save_data(test_df, os.path.join(get_project_root(), "data", "processed", "test_tfidf.csv"))
+        save_data(train_df, os.path.join(get_project_root(), constants.Folders.data, constants.Folders.processed, "train_tfidf.csv"))
+        save_data(test_df, os.path.join(get_project_root(), constants.Folders.data, constants.Folders.processed, "test_tfidf.csv"))
     except Exception as e:
         logger.error('Failed to complete the feature engineering process: %s', e)
         print(f"Error: {e}")

@@ -15,8 +15,9 @@ import string
 from utils import get_project_root
 
 from logger_setup import setup_logger
+import constants
 
-logger = setup_logger(__name__, log_file='data_preprocessing.log', level=logging.DEBUG)
+logger = setup_logger(__name__, log_file=constants.LogFiles.data_preprocessing, level=logging.DEBUG)
 
 def transform_text(text):
     """
@@ -72,9 +73,9 @@ def main(text_column='text', target_column='target'):
     try:
         # Fetch the data from data/raw
 
-        train_data = pd.read_csv(os.path.join(get_project_root(), "data", "raw", "train.csv"))
-        test_data = pd.read_csv(os.path.join(get_project_root(), "data", "raw", "test.csv"))
-        data_path = os.path.join(get_project_root(), "data", "interim")
+        train_data = pd.read_csv(os.path.join(get_project_root(), constants.Folders.data, constants.Folders.raw, "train.csv"))
+        test_data = pd.read_csv(os.path.join(get_project_root(), constants.Folders.data, constants.Folders.raw, "test.csv"))
+        data_path = os.path.join(get_project_root(), constants.Folders.data, constants.Folders.interim)
         logger.debug('Data loaded properly')
 
         # Transform the data
@@ -82,7 +83,7 @@ def main(text_column='text', target_column='target'):
         test_processed_data = preprocess_df(test_data, text_column, target_column)
 
         # Store the data inside data/processed
-        data_path = os.path.join(get_project_root(), "data", "interim")
+        data_path = os.path.join(get_project_root(), constants.Folders.data, constants.Folders.interim)
         os.makedirs(data_path, exist_ok=True)
 
         train_processed_data.to_csv(os.path.join(data_path, "train_processed.csv"), index=False)

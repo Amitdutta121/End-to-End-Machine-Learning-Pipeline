@@ -6,7 +6,7 @@ import logging
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score
 import yaml
-# from dvclive import Live
+from dvclive import Live
 from utils import get_project_root, from_root
 
 from logger_setup import setup_logger
@@ -110,12 +110,12 @@ def main():
         metrics = evaluate_model(clf, X_test, y_test)
 
         # Experiment tracking using dvclive
-        # with Live(save_dvc_exp=True) as live:
-        #     live.log_metric('accuracy', accuracy_score(y_test, y_test))
-        #     live.log_metric('precision', precision_score(y_test, y_test))
-        #     live.log_metric('recall', recall_score(y_test, y_test))
-        #
-        #     live.log_params(params)
+        with Live(save_dvc_exp=True) as live:
+            live.log_metric('accuracy', accuracy_score(y_test, y_test))
+            live.log_metric('precision', precision_score(y_test, y_test))
+            live.log_metric('recall', recall_score(y_test, y_test))
+
+            live.log_params(params)
 
         save_metrics(metrics, from_root('reports', 'metrics.json'))
     except Exception as e:
